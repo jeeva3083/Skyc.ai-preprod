@@ -4,13 +4,14 @@
   "version": "1.0.0",
   "description": "Skyc.ai Enterprise Desktop Workspace",
   "main": "dist-electron/main.js",
+  "author": "Skyc.ai Enterprise",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on tcp:5173 && electron .\"",
-    "electron:build": "vite build && tsc -p electron/tsconfig.json && electron-builder"
+    "electron:build": "vite build && electron-builder"
   },
   "dependencies": {
     "@google/genai": "^0.1.1",
@@ -20,6 +21,7 @@
     "recharts": "^2.10.3"
   },
   "devDependencies": {
+    "@types/node": "^20.10.6",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react": "^4.2.1",
@@ -31,11 +33,14 @@
     "tailwindcss": "^3.4.0",
     "typescript": "^5.3.3",
     "vite": "^5.0.8",
+    "vite-plugin-electron": "^0.15.4",
+    "vite-plugin-electron-renderer": "^0.14.5",
     "wait-on": "^7.2.0"
   },
   "build": {
     "appId": "com.skyc.ai.desktop",
     "productName": "Skyc.ai Workspace",
+    "copyright": "Copyright © 2024 Skyc.ai",
     "directories": {
       "output": "release"
     },
@@ -44,13 +49,21 @@
       "dist-electron/**/*"
     ],
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "public/electron-vite.svg" 
     },
     "mac": {
-      "target": "dmg"
+      "target": "dmg",
+      "icon": "public/electron-vite.svg"
     },
     "linux": {
-      "target": "AppImage"
+      "target": "AppImage",
+      "icon": "public/electron-vite.svg"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
     }
   }
 }

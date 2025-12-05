@@ -4,11 +4,13 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+// The built directory structure
 process.env.DIST = path.join(__dirname, '../dist');
 process.env.VITE_PUBLIC = app.isPackaged ? process.env.DIST : path.join(__dirname, '../public');
 
 let win: BrowserWindow | null;
 
+// VITE_DEV_SERVER_URL is passed by vite-plugin-electron in development
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
 
 function createWindow() {
@@ -17,19 +19,22 @@ function createWindow() {
     height: 900,
     minWidth: 1024,
     minHeight: 768,
+    // Use a reliable path for the icon
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
-      contextIsolation: false, // For simplicity in this demo; use contextIsolation: true in production
+      contextIsolation: false,
+      webSecurity: false // Often helpful for loading local resources in some enterprise envs, use with caution
     },
-    titleBarStyle: 'hidden', // Clean modern look
+    titleBarStyle: 'hidden', 
     titleBarOverlay: {
       color: '#0f111a',
       symbolColor: '#ffffff',
       height: 40
     },
-    backgroundColor: '#0f111a'
+    backgroundColor: '#0f111a',
+    show: false // Don't show until ready to prevent white flash
   });
 
   // Test active push message to Renderer Process
@@ -40,11 +45,16 @@ function createWindow() {
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);
   } else {
-    // win.loadFile('dist/index.html')
+    // In production, load the index.html from the dist folder
     win.loadFile(path.join(process.env.DIST, 'index.html'));
   }
 
-  // Open external links in default browser, not Electron window
+  // Gracefully show window when ready
+  win.once('ready-to-show', () => {
+    win?.show();
+  });
+
+  // Open external links in default browser
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('https:')) {
       shell.openExternal(url);
@@ -53,9 +63,6 @@ function createWindow() {
   });
 }
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if ((process as any).platform !== 'darwin') {
     app.quit();
@@ -63,8 +70,6 @@ app.on('window-all-closed', () => {
 });
 
 app.on('activate', () => {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
