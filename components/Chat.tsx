@@ -29,14 +29,13 @@ const Chat: React.FC<ChatProps> = ({ role }) => {
     }
   }, [messages, loading]);
 
-  // Simulate agent "thinking" steps
   useEffect(() => {
     if (!loading) {
       setLoadingStep('');
       return;
     }
     const steps = isInternalMode 
-      ? ['Authenticating Access...', 'Querying Secure Vector DB...', 'Synthesizing Internal Data...']
+      ? ['Authenticating...', 'Accessing Secure Vector DB...', 'Analyzing Internal Data...']
       : ['Connecting to Web...', 'Verifying External Sources...', 'Cross-referencing Facts...'];
     
     let currentStep = 0;
@@ -47,7 +46,7 @@ const Chat: React.FC<ChatProps> = ({ role }) => {
       if (currentStep < steps.length) {
         setLoadingStep(steps[currentStep]);
       }
-    }, 800);
+    }, 1000);
 
     return () => clearInterval(interval);
   }, [loading, isInternalMode]);
@@ -76,7 +75,6 @@ const Chat: React.FC<ChatProps> = ({ role }) => {
         text: text,
         timestamp: new Date(),
         isInternal: isInternalMode,
-        // If internal, use mock citations. If external, use real grounding chunks if available.
         citations: isInternalMode 
           ? ['Email: Q3_Report.msg', 'Doc: Security_Protocol_v2.pdf'] 
           : undefined,
@@ -85,98 +83,76 @@ const Chat: React.FC<ChatProps> = ({ role }) => {
       
       setMessages(prev => [...prev, aiMsg]);
     } catch (error) {
-      // Error handling
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-140px)] bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+    // Dynamic height calculation to fit mobile viewport correctly
+    <div className="flex flex-col h-[calc(100vh-140px)] md:h-[calc(100vh-160px)] bg-white rounded-2xl border border-purple-100 shadow-sm overflow-hidden">
       
-      {/* Chat Header / Mode Switcher */}
-      <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-        <div className="flex items-center space-x-4">
+      {/* Chat Header */}
+      <div className="p-3 md:p-4 border-b border-purple-50 flex flex-col sm:flex-row sm:items-center justify-between bg-slate-50/50 gap-3">
+        <div className="flex bg-slate-100/80 p-1 rounded-xl w-full sm:w-auto">
           <button
             onClick={() => setIsInternalMode(true)}
-            className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              isInternalMode ? 'bg-slate-900 text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+            className={`flex-1 sm:flex-none flex justify-center items-center px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-all ${
+              isInternalMode ? 'bg-white text-slate-900 shadow-sm ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            <Lock size={14} className="mr-2" />
-            Internal Agent
+            <Lock size={14} className="mr-2 text-emerald-500" />
+            Internal
           </button>
           <button
             onClick={() => setIsInternalMode(false)}
-            className={`flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              !isInternalMode ? 'bg-[#E30613] text-white shadow-md' : 'bg-white text-slate-600 border border-slate-200 hover:bg-slate-50'
+            className={`flex-1 sm:flex-none flex justify-center items-center px-4 py-2 rounded-lg text-xs md:text-sm font-medium transition-all ${
+              !isInternalMode ? 'bg-white text-slate-900 shadow-sm ring-1 ring-black/5' : 'text-slate-500 hover:text-slate-700'
             }`}
           >
-            <Globe size={14} className="mr-2" />
-            External Agent
+            <Globe size={14} className="mr-2 text-blue-500" />
+            Web
           </button>
         </div>
-        <div className="flex items-center text-xs text-slate-400">
-          <span className={`w-2 h-2 rounded-full mr-2 ${isInternalMode ? 'bg-emerald-500' : 'bg-orange-500'}`}></span>
-          {isInternalMode ? 'Secure Environment: Swiss Cloud' : 'External Access: Public Internet'}
+        <div className="hidden sm:flex items-center text-[10px] uppercase tracking-wider font-bold text-slate-400">
+          <div className={`w-2 h-2 rounded-full mr-2 ${isInternalMode ? 'bg-emerald-500 animate-pulse' : 'bg-blue-500'}`}></div>
+          {isInternalMode ? 'Secure Channel' : 'Public Access'}
         </div>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6" ref={scrollRef}>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-6 bg-gradient-to-b from-white to-purple-50/30" ref={scrollRef}>
         {messages.map((msg) => (
           <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[75%] rounded-2xl p-5 ${
+            <div className={`max-w-[85%] md:max-w-[75%] rounded-2xl p-4 md:p-5 shadow-sm ${
               msg.role === 'user' 
-                ? 'bg-slate-900 text-white rounded-tr-none' 
-                : 'bg-slate-100 text-slate-800 rounded-tl-none border border-slate-200 shadow-sm'
+                ? 'bg-slate-900 text-white rounded-tr-sm' 
+                : 'bg-white text-slate-800 rounded-tl-sm border border-purple-100'
             }`}>
-              <div className="flex items-center mb-2 opacity-50 text-xs uppercase tracking-wider font-bold">
-                {msg.role === 'user' ? 'You' : 'Skyc.ai Agent'}
+              <div className="flex items-center mb-2 opacity-50 text-[10px] uppercase tracking-wider font-bold">
+                {msg.role === 'user' ? 'You' : 'Skyc.ai'}
                 {msg.role === 'model' && (
-                  <span className={`ml-2 px-1.5 py-0.5 rounded text-[10px] ${msg.isInternal ? 'bg-emerald-200 text-emerald-800' : 'bg-orange-200 text-orange-800'}`}>
-                    {msg.isInternal ? 'PRIVATE' : 'PUBLIC'}
+                  <span className={`ml-2 px-1.5 py-0.5 rounded text-[9px] ${msg.isInternal ? 'bg-emerald-100 text-emerald-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {msg.isInternal ? 'INT' : 'EXT'}
                   </span>
                 )}
               </div>
               <p className="whitespace-pre-wrap leading-relaxed text-sm">{msg.text}</p>
               
-              {/* Internal Citations (Mock) */}
-              {msg.citations && msg.citations.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-slate-200/50">
-                  <p className="text-xs font-semibold mb-2 opacity-70 flex items-center">
-                    <FileText size={12} className="mr-1" /> Internal Sources:
-                  </p>
+              {/* Citations */}
+              {(msg.citations || msg.groundingChunks) && (
+                <div className="mt-4 pt-3 border-t border-dashed border-current opacity-70">
                   <div className="flex flex-wrap gap-2">
-                    {msg.citations.map((cite, i) => (
-                      <span key={i} className="text-[10px] bg-white/60 px-2 py-1.5 rounded border border-slate-200/50 truncate max-w-xs flex items-center hover:bg-white cursor-pointer transition-colors">
-                        {cite}
+                    {msg.citations?.map((cite, i) => (
+                      <span key={i} className="text-[10px] bg-emerald-50/50 px-2 py-1 rounded border border-emerald-100 flex items-center">
+                        <FileText size={10} className="mr-1" /> {cite}
                       </span>
                     ))}
-                  </div>
-                </div>
-              )}
-
-              {/* External Grounding (Real) */}
-              {msg.groundingChunks && msg.groundingChunks.length > 0 && (
-                <div className="mt-4 pt-3 border-t border-slate-200/50">
-                  <p className="text-xs font-semibold mb-2 opacity-70 flex items-center">
-                    <Globe size={12} className="mr-1" /> Web Sources:
-                  </p>
-                  <div className="flex flex-col gap-1">
-                    {msg.groundingChunks.map((chunk, i) => (
-                      chunk.web ? (
-                        <a 
-                          key={i} 
-                          href={chunk.web.uri} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          className="text-[11px] text-blue-600 hover:underline flex items-center bg-white/60 px-2 py-1.5 rounded border border-slate-200/50"
-                        >
-                          <ExternalLink size={10} className="mr-2 flex-shrink-0" />
-                          <span className="truncate">{chunk.web.title || chunk.web.uri}</span>
-                        </a>
-                      ) : null
+                    {msg.groundingChunks?.map((chunk, i) => chunk.web && (
+                      <a key={i} href={chunk.web.uri} target="_blank" rel="noreferrer" className="text-[10px] bg-blue-50/50 px-2 py-1 rounded border border-blue-100 flex items-center hover:bg-blue-100 transition-colors">
+                        <ExternalLink size={10} className="mr-1" /> {chunk.web.title}
+                      </a>
                     ))}
                   </div>
                 </div>
@@ -185,17 +161,17 @@ const Chat: React.FC<ChatProps> = ({ role }) => {
           </div>
         ))}
         
-        {/* Agent Thinking Indicator */}
+        {/* Loading State */}
         {loading && (
           <div className="flex justify-start animate-fade-in">
-            <div className="bg-white border border-slate-200 shadow-md rounded-2xl rounded-tl-none p-4 flex items-center space-x-3">
-              <div className="relative">
-                <div className="absolute inset-0 bg-blue-100 rounded-full animate-ping opacity-75"></div>
-                <Bot className="relative text-blue-600" size={24} />
+            <div className="bg-white border border-purple-100 shadow-sm rounded-2xl rounded-tl-sm p-4 flex items-center space-x-3">
+              <div className="relative flex-shrink-0">
+                <div className="absolute inset-0 bg-purple-200 rounded-full animate-ping opacity-50"></div>
+                <Bot className="relative text-purple-600" size={24} />
               </div>
-              <div>
-                <div className="text-sm font-semibold text-slate-800">Agent Working</div>
-                <div className="text-xs text-slate-500 flex items-center mt-0.5">
+              <div className="min-w-0">
+                <div className="text-sm font-semibold text-slate-800">Processing</div>
+                <div className="text-xs text-purple-600 flex items-center mt-0.5 truncate">
                   <Loader2 size={10} className="animate-spin mr-1.5" />
                   {loadingStep}
                 </div>
@@ -205,43 +181,29 @@ const Chat: React.FC<ChatProps> = ({ role }) => {
         )}
       </div>
 
-      {/* Input Area */}
-      <div className="p-4 bg-white border-t border-slate-100">
-        <div className="relative">
+      {/* Input */}
+      <div className="p-3 md:p-4 bg-white border-t border-purple-50">
+        <div className="relative flex items-center">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder={isInternalMode ? "Ask about internal emails, reports, or KPIs..." : "Search the web for external market trends..."}
-            className="w-full pl-4 pr-32 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all shadow-sm font-medium text-slate-700"
+            placeholder="Type your command..."
+            className="w-full pl-4 pr-24 md:pr-32 py-3 md:py-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 focus:bg-white transition-all shadow-inner text-sm md:text-base"
           />
-          <div className="absolute right-2 top-2 bottom-2 flex items-center space-x-1">
-            <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">
-              <Paperclip size={20} />
-            </button>
-            <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-200 rounded-lg transition-colors">
-              <Mic size={20} />
+          <div className="absolute right-2 flex items-center space-x-1">
+            <button className="p-1.5 md:p-2 text-slate-400 hover:text-purple-600 rounded-lg transition-colors hidden sm:block">
+              <Paperclip size={18} />
             </button>
             <button 
               onClick={handleSend}
               disabled={!input.trim() || loading}
-              className="p-2 bg-[#E30613] text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+              className="p-2 bg-gradient-to-r from-purple-600 to-red-500 text-white rounded-lg hover:shadow-lg transition-all disabled:opacity-50 disabled:shadow-none"
             >
-              <Send size={20} />
+              <Send size={18} />
             </button>
           </div>
-        </div>
-        <div className="flex justify-between items-center mt-2 px-1">
-          <div className="text-[10px] text-slate-400">
-            Skyc.ai output is generated by AI. Verify critical information.
-          </div>
-          {isInternalMode && (
-             <div className="flex items-center text-[10px] text-emerald-600 font-medium">
-               <Lock size={10} className="mr-1" />
-               AES-256 Encrypted
-             </div>
-          )}
         </div>
       </div>
     </div>
