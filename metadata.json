@@ -1,0 +1,8 @@
+{
+  "name": "Skyc.ai - Enterprise Agentic Workspace",
+  "description": "A privacy-first, role-aware AI workspace for enterprise operations. Features internal/external agents, secure data ingestion, analytics dashboards, and a collaborative whiteboard environment.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}
