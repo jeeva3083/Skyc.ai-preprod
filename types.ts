@@ -33,11 +33,15 @@ export interface DashboardMetric {
 
 export interface WhiteboardNode {
   id: string;
-  type: 'note' | 'chart' | 'process';
+  type: 'note' | 'chart' | 'process' | 'media' | 'integration';
   x: number;
   y: number;
   content: string;
   color?: string;
+  meta?: {
+    icon?: string; // For integrations like 'powerbi', 'miro'
+    fileType?: string;
+  };
 }
 
 export interface WhiteboardConnection {

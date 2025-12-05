@@ -16,6 +16,7 @@ function App() {
         return <Dashboard role={currentRole} />;
       case ViewMode.CHAT:
         return <Chat role={currentRole} />;
+      // LiveAgent route removed - functionality merged into Chat
       case ViewMode.WHITEBOARD:
         return <Whiteboard role={currentRole} />;
       case ViewMode.SETTINGS:

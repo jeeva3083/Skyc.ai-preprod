@@ -9,7 +9,8 @@ import {
   Menu,
   ChevronDown,
   X,
-  Zap
+  Zap,
+  Cpu
 } from 'lucide-react';
 
 interface LayoutProps {
@@ -59,8 +60,8 @@ const Layout: React.FC<LayoutProps> = ({ currentRole, setRole, viewMode, setView
   }, []);
 
   const navItems = [
-    { mode: ViewMode.DASHBOARD, icon: LayoutDashboard, label: 'Dashboard' },
-    { mode: ViewMode.CHAT, icon: MessageSquare, label: 'AI Agents' },
+    { mode: ViewMode.DASHBOARD, icon: LayoutDashboard, label: 'Ops Dashboard' },
+    { mode: ViewMode.CHAT, icon: Cpu, label: 'Neural Uplink' }, // Renamed and Icon changed
     { mode: ViewMode.WHITEBOARD, icon: Trello, label: 'Workspace' },
     { mode: ViewMode.SETTINGS, icon: Settings, label: 'Settings' },
   ];
@@ -202,7 +203,7 @@ const Layout: React.FC<LayoutProps> = ({ currentRole, setRole, viewMode, setView
             <div>
               <h1 className="text-lg lg:text-xl font-bold text-slate-900 tracking-tight">
                 {viewMode === ViewMode.DASHBOARD && 'Operational Overview'}
-                {viewMode === ViewMode.CHAT && 'Agent Workspace'}
+                {viewMode === ViewMode.CHAT && 'Neural Agent Interface'}
                 {viewMode === ViewMode.WHITEBOARD && 'Collaboration Canvas'}
                 {viewMode === ViewMode.SETTINGS && 'Enterprise Settings'}
               </h1>
