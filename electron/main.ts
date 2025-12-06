@@ -10,7 +10,6 @@ process.env.VITE_PUBLIC = app.isPackaged ? process.env.DIST : path.join(__dirnam
 
 let win: BrowserWindow | null;
 
-// VITE_DEV_SERVER_URL is passed by vite-plugin-electron in development
 const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
 
 function createWindow() {
@@ -19,25 +18,24 @@ function createWindow() {
     height: 900,
     minWidth: 1024,
     minHeight: 768,
-    // Use a reliable path for the icon
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+    frame: false, // Frameless for custom UI "smooth" feel
+    titleBarStyle: 'hidden', // Hide default title bar on Mac/Windows
+    titleBarOverlay: {
+      color: '#0f111a', // Match sidebar color
+      symbolColor: '#ffffff',
+      height: 40
+    },
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
       contextIsolation: false,
-      webSecurity: false // Often helpful for loading local resources in some enterprise envs, use with caution
+      webSecurity: false // Allow loading local resources and cross-origin in workspace
     },
-    titleBarStyle: 'hidden', 
-    titleBarOverlay: {
-      color: '#0f111a',
-      symbolColor: '#ffffff',
-      height: 40
-    },
-    backgroundColor: '#0f111a',
-    show: false // Don't show until ready to prevent white flash
+    backgroundColor: '#0f111a', // Match initial background to prevent white flash
+    show: false // Wait until ready-to-show
   });
 
-  // Test active push message to Renderer Process
   win.webContents.on('did-finish-load', () => {
     win?.webContents.send('main-process-message', (new Date).toLocaleString());
   });
@@ -45,18 +43,23 @@ function createWindow() {
   if (VITE_DEV_SERVER_URL) {
     win.loadURL(VITE_DEV_SERVER_URL);
   } else {
-    // In production, load the index.html from the dist folder
     win.loadFile(path.join(process.env.DIST, 'index.html'));
   }
 
-  // Gracefully show window when ready
+  // Smooth Entry: Only show window when content is loaded and layout is calculated
   win.once('ready-to-show', () => {
     win?.show();
   });
 
-  // Open external links in default browser
+  // Handle external links and auth popups
   win.webContents.setWindowOpenHandler(({ url }) => {
-    if (url.startsWith('https:')) {
+    // Allow Microsoft Auth flows to open in a new window managed by Electron (needed for loginPopup to work)
+    if (url.includes('login.microsoftonline.com') || url.includes('about:blank')) {
+        return { action: 'allow' };
+    }
+
+    // Open other external links in the system default browser
+    if (url.startsWith('https:') || url.startsWith('http:')) {
       shell.openExternal(url);
     }
     return { action: 'deny' };

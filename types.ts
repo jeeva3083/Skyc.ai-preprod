@@ -17,11 +17,17 @@ export interface ChatMessage {
   role: 'user' | 'model';
   text: string;
   timestamp: Date;
-  isInternal: boolean; // True if using internal private agent
-  citations?: string[]; // For internal mock citations
-  groundingChunks?: { // For real external google search citations
+  isInternal: boolean; 
+  citations?: string[]; 
+  groundingChunks?: { 
     web?: { uri: string; title: string };
+    maps?: { title: string; googleMapsUri: string; address?: string };
   }[];
+  // Multimedia capabilities
+  videoUri?: string; // For Veo generated videos
+  audioData?: string; // For TTS or audio responses
+  imageUri?: string; // For uploaded images
+  isVeoGeneration?: boolean; // Flag if this message was a video gen request
 }
 
 export interface DashboardMetric {
@@ -33,14 +39,16 @@ export interface DashboardMetric {
 
 export interface WhiteboardNode {
   id: string;
-  type: 'note' | 'chart' | 'process' | 'media' | 'integration';
+  type: 'note' | 'chart' | 'process' | 'media' | 'integration' | 'file';
   x: number;
   y: number;
   content: string;
   color?: string;
   meta?: {
-    icon?: string; // For integrations like 'powerbi', 'miro'
-    fileType?: string;
+    icon?: string; 
+    fileType?: 'pdf' | 'doc' | 'sheet' | 'video' | 'audio' | 'image' | 'text' | 'unknown';
+    fileUrl?: string;
+    fileName?: string;
   };
 }
 
@@ -48,4 +56,9 @@ export interface WhiteboardConnection {
   id: string;
   from: string;
   to: string;
+}
+
+export interface WhiteboardAction {
+  action: 'create_node' | 'connect_nodes' | 'delete_node' | 'clear_canvas';
+  params?: any;
 }

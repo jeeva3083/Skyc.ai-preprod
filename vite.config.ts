@@ -4,6 +4,10 @@ import electron from 'vite-plugin-electron/simple';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    port: 5173, // Fixed port is required for Azure Redirect URI
+    strictPort: true
+  },
   plugins: [
     react(),
     electron({

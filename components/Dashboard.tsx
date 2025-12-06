@@ -11,14 +11,31 @@ import {
   AreaChart,
   Area
 } from 'recharts';
-import { TrendingUp, AlertTriangle, Mail, Users, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { 
+  TrendingUp, 
+  AlertTriangle, 
+  Mail, 
+  Users, 
+  ArrowUpRight, 
+  ArrowDownRight, 
+  Calendar, 
+  Phone, 
+  CheckSquare, 
+  MoreHorizontal,
+  Star,
+  Clock,
+  Video,
+  Workflow,
+  Bug,
+  MessageCircle
+} from 'lucide-react';
 
 interface DashboardProps {
   role: UserRole;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ role }) => {
-  // Mock Data
+  // Mock Data for Charts
   const emailData = [
     { name: 'Mon', internal: 4000, external: 2400 },
     { name: 'Tue', internal: 3000, external: 1398 },
@@ -32,6 +49,38 @@ const Dashboard: React.FC<DashboardProps> = ({ role }) => {
     { name: 'W2', score: 35 },
     { name: 'W3', score: 25 },
     { name: 'W4', score: 60 },
+  ];
+
+  // --- MOCK DATA FOR NEW WIDGETS ---
+  const keyEmails = [
+    { id: 1, from: 'Sarah Connor', subject: 'Urgent: Security Protocol Update', time: '10m ago', important: true, avatar: 'SC' },
+    { id: 2, from: 'Director Fury', subject: 'Budget Approval Required for Q4', time: '1h ago', important: true, avatar: 'DF' },
+    { id: 3, from: 'Legal Team', subject: 'Contract Revision v2', time: '2h ago', important: false, avatar: 'LT' },
+    { id: 4, from: 'IT Support', subject: 'Scheduled Maintenance', time: '4h ago', important: false, avatar: 'IT' },
+  ];
+
+  const upcomingMeetings = [
+    { id: 1, title: 'Q3 Board Review', time: '10:00 AM', duration: '1h', attendees: 4, type: 'video' },
+    { id: 2, title: 'Project Falcon Sync', time: '02:00 PM', duration: '30m', attendees: 6, type: 'person' },
+    { id: 3, title: 'Client Onboarding', time: '04:30 PM', duration: '45m', attendees: 2, type: 'video' },
+  ];
+
+  const callList = [
+    { id: 1, name: 'Dr. Emily Smith', role: 'Lead Researcher', status: 'online', avatar: 'ES' },
+    { id: 2, name: 'Agent K', role: 'Security Ops', status: 'busy', avatar: 'AK' },
+    { id: 3, name: 'Support Desk', role: 'Global Ops', status: 'offline', avatar: 'SD' },
+  ];
+
+  const aiFollowUps = [
+    { id: 1, task: 'Review Q3 Financial Discrepancies', status: 'pending', priority: 'high' },
+    { id: 2, task: 'Schedule follow-up with Cyberdyne', status: 'pending', priority: 'medium' },
+    { id: 3, task: 'Approve new hiring requisitions', status: 'done', priority: 'low' },
+  ];
+
+  const serviceTickets = [
+      { id: 'INC00124', title: 'VPN Latency in EU Region', sys: 'ServiceNow', type: 'incident', status: 'Critical' },
+      { id: 'KAN-452', title: 'Mobile App Login Crash', sys: 'JIRA', type: 'bug', status: 'In Progress' },
+      { id: 'INC00129', title: 'Outlook Sync Failure', sys: 'ServiceNow', type: 'incident', status: 'New' },
   ];
 
   const StatCard = ({ title, value, change, icon: Icon, trend, color }: any) => (
@@ -62,53 +111,28 @@ const Dashboard: React.FC<DashboardProps> = ({ role }) => {
   );
 
   return (
-    <div className="space-y-6 animate-fade-in pb-10">
+    <div className="h-full overflow-y-auto p-6 space-y-6 animate-fade-in bg-[#f8fafc]">
       
-      {/* Metrics Grid - Responsive columns */}
+      {/* Metrics Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <StatCard 
-          title="Emails Processed" 
-          value="1.2M" 
-          change={12.5} 
-          icon={Mail} 
-          trend="up" 
-          color="bg-blue-50 text-blue-600"
-        />
-        <StatCard 
-          title="Risk Alerts" 
-          value="24" 
-          change={-5.2} 
-          icon={AlertTriangle} 
-          trend="down" 
-          color="bg-rose-50 text-rose-600"
-        />
-        <StatCard 
-          title="Active Agents" 
-          value="8" 
-          change={0} 
-          icon={Users} 
-          trend="neutral" 
-          color="bg-purple-50 text-purple-600"
-        />
-        <StatCard 
-          title="SLA Breaches" 
-          value="3" 
-          change={2.1} 
-          icon={TrendingUp} 
-          trend="down" 
-          color="bg-amber-50 text-amber-600"
-        />
+        <StatCard title="Emails Processed" value="1.2M" change={12.5} icon={Mail} trend="up" color="bg-blue-50 text-blue-600"/>
+        <StatCard title="Risk Alerts" value="24" change={-5.2} icon={AlertTriangle} trend="down" color="bg-rose-50 text-rose-600"/>
+        <StatCard title="Active Agents" value="8" change={0} icon={Users} trend="neutral" color="bg-purple-50 text-purple-600"/>
+        <StatCard title="SLA Breaches" value="3" change={2.1} icon={TrendingUp} trend="down" color="bg-amber-50 text-amber-600"/>
       </div>
 
-      {/* Charts Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
-        {/* Email Volume Chart */}
-        <div className="bg-white p-6 rounded-2xl border border-purple-100 shadow-sm">
-          <h3 className="text-base font-bold text-slate-800 mb-6 flex items-center">
-            <span className="w-2 h-2 rounded-full bg-slate-900 mr-2"></span>
-            Communication Volume
-          </h3>
-          <div className="h-64 sm:h-80">
+      {/* Main Charts Area */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Email Volume Chart (2 cols) */}
+        <div className="xl:col-span-2 bg-white p-6 rounded-2xl border border-purple-100 shadow-sm">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-base font-bold text-slate-800 flex items-center">
+                <span className="w-2 h-2 rounded-full bg-slate-900 mr-2"></span>
+                Communication Volume
+            </h3>
+            <button className="text-slate-400 hover:text-purple-600"><MoreHorizontal size={20}/></button>
+          </div>
+          <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={emailData}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
@@ -125,18 +149,18 @@ const Dashboard: React.FC<DashboardProps> = ({ role }) => {
           </div>
         </div>
 
-        {/* Risk Analysis */}
-        <div className="bg-white p-6 rounded-2xl border border-purple-100 shadow-sm relative overflow-hidden">
+        {/* Risk Trend (1 col) */}
+        <div className="bg-white p-6 rounded-2xl border border-purple-100 shadow-sm relative overflow-hidden flex flex-col">
           <div className="flex justify-between items-center mb-6 relative z-10">
             <h3 className="text-base font-bold text-slate-800 flex items-center">
               <span className="w-2 h-2 rounded-full bg-[#E30613] mr-2 animate-pulse"></span>
-              Compliance Risk Trend
+              Risk Trend
             </h3>
             {role === UserRole.CEO && (
-              <span className="text-[10px] bg-rose-50 text-rose-600 px-2 py-1 rounded-full border border-rose-100 font-bold tracking-wide">CEO VIEW</span>
+              <span className="text-[10px] bg-rose-50 text-rose-600 px-2 py-1 rounded-full border border-rose-100 font-bold tracking-wide">CEO</span>
             )}
           </div>
-          <div className="h-64 sm:h-80 relative z-10">
+          <div className="flex-1 min-h-[200px] relative z-10">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={riskData}>
                 <defs>
@@ -148,49 +172,143 @@ const Dashboard: React.FC<DashboardProps> = ({ role }) => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
                 <YAxis axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#94a3b8'}} />
-                <Tooltip 
-                  contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #fee2e2' }}
-                />
+                <Tooltip contentStyle={{ backgroundColor: '#fff', borderRadius: '12px', border: '1px solid #fee2e2' }} />
                 <Area type="monotone" dataKey="score" stroke="#E30613" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
-          {/* Background decoration */}
-          <div className="absolute top-0 right-0 w-32 h-32 bg-rose-50 rounded-bl-full opacity-50 z-0"></div>
         </div>
       </div>
 
-      {role === UserRole.ANALYST && (
-        <div className="bg-white p-6 rounded-2xl border border-purple-100 shadow-sm">
-          <h3 className="text-base font-bold text-slate-800 mb-4">Raw Data Ingestion Logs</h3>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm text-left text-slate-500">
-              <thead className="text-xs text-slate-700 uppercase bg-slate-50">
-                <tr>
-                  <th className="px-6 py-3 rounded-l-lg">Timestamp</th>
-                  <th className="px-6 py-3">Source</th>
-                  <th className="px-6 py-3">Status</th>
-                  <th className="px-6 py-3 rounded-r-lg">Items</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr className="bg-white border-b hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 font-mono text-xs">2023-10-24 10:00</td>
-                  <td className="px-6 py-4 font-medium text-slate-800">Exchange Server EU</td>
-                  <td className="px-6 py-4"><span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs">Complete</span></td>
-                  <td className="px-6 py-4">45,200</td>
-                </tr>
-                <tr className="bg-white border-b hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 font-mono text-xs">2023-10-24 10:05</td>
-                  <td className="px-6 py-4 font-medium text-slate-800">SharePoint Ops</td>
-                  <td className="px-6 py-4"><span className="bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded text-xs">Complete</span></td>
-                  <td className="px-6 py-4">1,200</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+      {/* --- NEW WIDGETS ROW --- */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        
+        {/* WIDGET 1: KEY EMAILS */}
+        <div className="bg-white rounded-2xl border border-purple-100 shadow-sm flex flex-col h-96">
+            <div className="p-4 border-b border-slate-100 flex justify-between items-center">
+                <h4 className="font-bold text-slate-800 flex items-center text-sm">
+                    <Mail size={16} className="mr-2 text-blue-500" /> Key Emails
+                </h4>
+                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">4 New</span>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                {keyEmails.map(email => (
+                    <div key={email.id} className="p-3 hover:bg-slate-50 rounded-xl transition-colors cursor-pointer group border border-transparent hover:border-slate-100">
+                        <div className="flex justify-between items-start mb-1">
+                            <div className="flex items-center space-x-2">
+                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 text-[10px] flex items-center justify-center font-bold text-slate-600">
+                                    {email.avatar}
+                                </div>
+                                <span className="text-xs font-semibold text-slate-700">{email.from}</span>
+                            </div>
+                            <span className="text-[10px] text-slate-400">{email.time}</span>
+                        </div>
+                        <p className="text-sm text-slate-800 font-medium leading-tight line-clamp-2">{email.subject}</p>
+                        <div className="mt-2 flex space-x-2">
+                            {email.important && <span className="text-[10px] flex items-center text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded"><Star size={8} className="mr-1 fill-amber-600"/> Priority</span>}
+                        </div>
+                    </div>
+                ))}
+            </div>
         </div>
-      )}
+
+        {/* WIDGET 2: SERVICE HEALTH & TICKETS (JIRA/ServiceNow) */}
+        <div className="bg-white rounded-2xl border border-purple-100 shadow-sm flex flex-col h-96">
+             <div className="p-4 border-b border-slate-100 flex justify-between items-center">
+                <h4 className="font-bold text-slate-800 flex items-center text-sm">
+                    <Workflow size={16} className="mr-2 text-rose-500" /> Ops & Service
+                </h4>
+                <span className="flex space-x-1">
+                    <div className="w-2 h-2 rounded-full bg-rose-500"></div>
+                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                </span>
+            </div>
+            <div className="flex-1 overflow-y-auto p-3 space-y-2">
+                {serviceTickets.map(ticket => (
+                    <div key={ticket.id} className="p-3 border border-slate-100 rounded-xl hover:bg-slate-50 transition-colors">
+                        <div className="flex justify-between mb-1">
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${ticket.sys === 'ServiceNow' ? 'bg-rose-100 text-rose-700' : 'bg-blue-100 text-blue-700'}`}>{ticket.sys}</span>
+                            <span className="text-[10px] text-slate-400 font-mono">{ticket.id}</span>
+                        </div>
+                        <p className="text-xs font-semibold text-slate-800">{ticket.title}</p>
+                        <div className="flex items-center justify-between mt-2">
+                            <span className="text-[10px] text-slate-500">{ticket.type}</span>
+                            <span className={`text-[10px] font-medium ${ticket.status === 'Critical' ? 'text-red-500' : 'text-slate-600'}`}>{ticket.status}</span>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        {/* WIDGET 3: CALL PEOPLE (Updated with Teams/Zoom) */}
+        <div className="bg-white rounded-2xl border border-purple-100 shadow-sm flex flex-col h-96">
+            <div className="p-4 border-b border-slate-100 flex justify-between items-center">
+                <h4 className="font-bold text-slate-800 flex items-center text-sm">
+                    <Phone size={16} className="mr-2 text-emerald-500" /> Quick Dial
+                </h4>
+            </div>
+            <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                {callList.map(person => (
+                    <div key={person.id} className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-xl transition-colors group">
+                        <div className="flex items-center space-x-3">
+                            <div className="relative">
+                                <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-500">
+                                    {person.avatar}
+                                </div>
+                                <div className={`absolute bottom-0 right-0 w-3 h-3 border-2 border-white rounded-full ${person.status === 'online' ? 'bg-emerald-500' : person.status === 'busy' ? 'bg-amber-500' : 'bg-slate-400'}`}></div>
+                            </div>
+                            <div>
+                                <p className="text-sm font-semibold text-slate-800">{person.name}</p>
+                                <p className="text-[10px] text-slate-500 uppercase tracking-wide">{person.role}</p>
+                            </div>
+                        </div>
+                        <div className="flex space-x-1">
+                            <button className="p-2 bg-indigo-50 text-indigo-500 rounded-full hover:bg-indigo-500 hover:text-white transition-all shadow-sm" title="Teams Chat">
+                                <MessageCircle size={14} />
+                            </button>
+                            <button className="p-2 bg-blue-50 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition-all shadow-sm" title="Zoom Call">
+                                <Video size={14} />
+                            </button>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        {/* WIDGET 4: AI FOLLOW UPS */}
+        <div className="bg-slate-900 rounded-2xl border border-slate-800 shadow-lg flex flex-col h-96 text-white relative overflow-hidden">
+             {/* Background glow */}
+             <div className="absolute top-0 right-0 w-32 h-32 bg-purple-600/20 blur-3xl rounded-full pointer-events-none"></div>
+             
+             <div className="p-4 border-b border-white/10 flex justify-between items-center relative z-10">
+                <h4 className="font-bold flex items-center text-sm">
+                    <CheckSquare size={16} className="mr-2 text-purple-400" /> AI Follow-Up
+                </h4>
+                <div className="px-2 py-0.5 rounded text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30">Auto-Generated</div>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4 space-y-3 relative z-10">
+                {aiFollowUps.map(item => (
+                    <div key={item.id} className="flex items-start space-x-3 group">
+                        <div className={`mt-1 w-4 h-4 rounded border flex items-center justify-center cursor-pointer transition-colors ${item.status === 'done' ? 'bg-emerald-500 border-emerald-500' : 'border-slate-600 hover:border-purple-400'}`}>
+                             {item.status === 'done' && <CheckSquare size={10} className="text-white" />}
+                        </div>
+                        <div className={`flex-1 text-sm ${item.status === 'done' ? 'text-slate-500 line-through' : 'text-slate-300'}`}>
+                            {item.task}
+                            <div className="mt-1 flex gap-2">
+                                {item.priority === 'high' && <span className="text-[9px] text-rose-400 bg-rose-900/20 px-1.5 rounded">High Priority</span>}
+                                {item.priority === 'medium' && <span className="text-[9px] text-amber-400 bg-amber-900/20 px-1.5 rounded">Medium</span>}
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+            {/* AI Footer Input */}
+            <div className="p-3 bg-white/5 border-t border-white/10 relative z-10">
+                <input type="text" placeholder="Add task for AI..." className="w-full bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none" />
+            </div>
+        </div>
+
+      </div>
     </div>
   );
 };

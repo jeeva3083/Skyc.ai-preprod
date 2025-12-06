@@ -2,19 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
-/* 
-   Fallback styles in case the build step is skipped.
-   The Tailwind CDN in index.html will handle the classes, 
-   but we define custom animations here explicitly.
-*/
+html {
+  scroll-behavior: smooth;
+  height: 100%;
+}
 
 body {
   margin: 0;
   padding: 0;
+  height: 100%;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #faf5ff; 
+  overflow: hidden; /* Prevent body scroll in Electron */
 }
 
+#root {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Electron Specific: Drag Regions */
+.titlebar-drag-region {
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.no-drag {
+  -webkit-app-region: no-drag;
+}
+
+/* Animations */
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }

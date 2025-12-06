@@ -14,6 +14,8 @@
     "electron:build": "vite build && electron-builder"
   },
   "dependencies": {
+    "@azure/msal-browser": "^3.10.0",
+    "@azure/msal-react": "^2.0.12",
     "@google/genai": "^0.1.1",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",
@@ -41,6 +43,8 @@
     "appId": "com.skyc.ai.desktop",
     "productName": "Skyc.ai Workspace",
     "copyright": "Copyright © 2024 Skyc.ai",
+    "compression": "maximum",
+    "asar": true,
     "directories": {
       "output": "release"
     },
@@ -50,11 +54,12 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "public/electron-vite.svg" 
+      "icon": "public/electron-vite.svg"
     },
     "mac": {
       "target": "dmg",
-      "icon": "public/electron-vite.svg"
+      "icon": "public/electron-vite.svg",
+      "darkModeSupport": true
     },
     "linux": {
       "target": "AppImage",
@@ -63,7 +68,8 @@
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
-      "createDesktopShortcut": true
+      "createDesktopShortcut": true,
+      "runAfterFinish": true
     }
   }
 }
